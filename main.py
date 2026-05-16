@@ -1,42 +1,13 @@
+from builtinCommands.cd.cd import cdBuiltin
+from builtinCommands.pwd.pwd import pwdBuiltin
+from builtinCommands.echo.echo import echoBuiltin
+from builtinCommands.exit.exit import exitBuiltin
+from builtinCommands.type.type import typeBuiltin
+from builtinCommands.clear.clear import clearBuiltin
+from utils.utils import checkOnPath
+
 import subprocess
 import sys
-import os
-
-def exitBuiltin() -> int:
-    return (1)
-
-def echoBuiltin(line: str) -> int:
-    if line.count("'") % 2 == 0:
-        line.replace("'", "")
-    print(line)
-    return (0)
-
-def checkOnPath(line: str, isTypeCommand: bool) -> int:
-    paths = os.getenv("PATH", "").split(":")
-    command = line.split()[0]
-    for path in paths:
-        fullPath = os.path.join(path, command)
-        if os.path.isfile(fullPath):
-            if os.access(fullPath, os.X_OK):
-                if isTypeCommand:
-                    print(command, "is", fullPath)
-                return (1)
-    return (0)
-
-def typeBuiltin(line: str) -> int:
-    if line == "type":
-        print("type is a shell builtin")
-    elif line == "echo":
-        print("echo is a shell builtin")
-    elif line == "exit":
-        print("exit is a shell builtin")
-    elif line == "pwd":
-        print("pwd is a shell builtin")
-    else :
-        if (checkOnPath(line, True) == 0):
-            print(line + ": not found")
-            return (0)
-    return (0)
 
 def execProgram(line: str) -> int:
     if (checkOnPath(line, False)):
@@ -44,21 +15,6 @@ def execProgram(line: str) -> int:
         return (0)
     else:
         return (-1)
-
-def pwdBuiltin() -> int:
-    print(os.getcwd())
-    return (0)
-
-def cdBuiltin(line: str) -> int:
-    if line.startswith("~"):
-        line = line.replace("~", str(os.getenv("HOME")))
-    elif not line.startswith("/"):
-        line = os.getcwd() + "/" + line
-    if os.path.exists(line):
-        os.chdir(line)
-    else:
-        print("cd: " + line + ": No such file or directory")
-    return (0)
 
 def parse(line: str) -> int:
     if line == "exit":
@@ -71,6 +27,8 @@ def parse(line: str) -> int:
         return (pwdBuiltin())
     if line.startswith("cd "):
         return (cdBuiltin(line[3:]))
+    if line.startswith("clear"):
+        return (clearBuiltin())
     else:
         return(execProgram(line))
 
@@ -86,4 +44,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
