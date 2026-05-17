@@ -1,5 +1,3 @@
-from .utils.utils import checkOnPath
-
 from .builtinCommands.cd.cd import cdBuiltin
 from .builtinCommands.pwd.pwd import pwdBuiltin
 from .builtinCommands.echo.echo import echoBuiltin
@@ -9,11 +7,13 @@ from .builtinCommands.clear.clear import clearBuiltin
 
 import sys
 import shlex
+import shutil
 import subprocess
 
 def execProgram(cmd: str, args: list) -> int:
-    if (checkOnPath(cmd, False)):
-        subprocess.run([cmd] + args)
+    path = shutil.which(cmd)
+    if path:
+        subprocess.run([cmd] + args, executable=path)
         return (0)
     else:
         return (-1)
@@ -51,7 +51,7 @@ def main():
         if returnStatus == 1:
             return
         elif returnStatus == -1:
-            print(line + ": command not found")
+            print(cmd + ": command not found")
 
 if __name__ == "__main__":
     main()
