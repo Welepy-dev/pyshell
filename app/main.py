@@ -19,6 +19,25 @@ def execProgram(cmd: str, args: list) -> int:
         return (-1)
 
 def parse(cmd: str, args: list) -> int:
+    if ">" in args or "1>" in args:
+        try:
+            idx = args.index(">")
+        except ValueError:
+            idx = args.index("1>")
+
+        cmd_args = args[:idx]
+        filename = args[idx + 1]
+
+        result = subprocess.run(
+            [cmd] + cmd_args,
+            capture_output=True,
+            text=True
+        ).stdout
+
+        with open(filename, "w") as file:
+            file.write(result)
+
+        return 0
     if cmd == "exit":
         return (exitBuiltin())        
     if cmd == "echo":
@@ -55,3 +74,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
